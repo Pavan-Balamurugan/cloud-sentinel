@@ -1,0 +1,149 @@
+{
+  "title": "System Overview",
+  "uid": "sentinel-overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Event Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-opensearch-datasource", "uid": "opensearch-ds" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "*",
+          "metrics": [{ "id": "1", "type": "count" }],
+          "bucketAggs": [
+            {
+              "id": "2",
+              "type": "date_histogram",
+              "field": "timestamp",
+              "settings": { "interval": "auto" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Total Events (last hour)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 8 },
+      "datasource": { "type": "grafana-opensearch-datasource", "uid": "opensearch-ds" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "*",
+          "metrics": [{ "id": "1", "type": "count" }],
+          "bucketAggs": [
+            { "id": "2", "type": "date_histogram", "field": "timestamp", "settings": { "interval": "1h" } }
+          ]
+        }
+      ],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" } }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["sum"] }, "colorMode": "value" }
+    },
+    {
+      "id": 3,
+      "title": "Errors (last hour)",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 8 },
+      "datasource": { "type": "grafana-opensearch-datasource", "uid": "opensearch-ds" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "level:ERROR",
+          "metrics": [{ "id": "1", "type": "count" }],
+          "bucketAggs": [
+            { "id": "2", "type": "date_histogram", "field": "timestamp", "settings": { "interval": "1h" } }
+          ]
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": { "reduceOptions": { "calcs": ["sum"] }, "colorMode": "value" }
+    },
+    {
+      "id": 4,
+      "title": "Events by Service",
+      "type": "bargauge",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "grafana-opensearch-datasource", "uid": "opensearch-ds" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "*",
+          "metrics": [{ "id": "1", "type": "count" }],
+          "bucketAggs": [
+            {
+              "id": "2",
+              "type": "terms",
+              "field": "service.keyword",
+              "settings": { "size": "10", "order": "desc", "orderBy": "_count" }
+            }
+          ]
+        }
+      ],
+      "options": { "displayMode": "gradient", "orientation": "horizontal" }
+    },
+    {
+      "id": 5,
+      "title": "Events by Type",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "datasource": { "type": "grafana-opensearch-datasource", "uid": "opensearch-ds" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "*",
+          "metrics": [{ "id": "1", "type": "count" }],
+          "bucketAggs": [
+            {
+              "id": "2",
+              "type": "terms",
+              "field": "eventType.keyword",
+              "settings": { "size": "15", "order": "desc", "orderBy": "_count" }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Log Level Distribution",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "datasource": { "type": "grafana-opensearch-datasource", "uid": "opensearch-ds" },
+      "targets": [
+        {
+          "refId": "A",
+          "query": "*",
+          "metrics": [{ "id": "1", "type": "count" }],
+          "bucketAggs": [
+            {
+              "id": "2",
+              "type": "terms",
+              "field": "level.keyword",
+              "settings": { "size": "10", "order": "desc", "orderBy": "_count" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
